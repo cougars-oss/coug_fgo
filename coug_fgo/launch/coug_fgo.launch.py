@@ -27,7 +27,6 @@ def generate_launch_description():
     auv_ns = LaunchConfiguration("auv_ns")
     set_origin = LaunchConfiguration("set_origin")
 
-    pkg_share = get_package_share_directory("coug_fgo")
     fleet_params = os.path.join(
         os.path.expanduser("~"), "config", "fleet", "coug_fgo_params.yaml"
     )
