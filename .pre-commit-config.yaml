@@ -15,7 +15,7 @@ repos:
       - id: black
 
   - repo: https://github.com/cougars-auv/coug-hooks
-    rev: 38b761a58f17a436b0e00792eb33485e51e43e61
+    rev: v1.0.0
     hooks:
       - id: ament_uncrustify
       - id: ament_cpplint
