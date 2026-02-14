@@ -27,35 +27,34 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.runner }}
-    container:
-      image: snelsondurrant/cougars:latest
-      options: --user root
     steps:
       - uses: actions/checkout@v6
       - uses: actions/cache@v5
         with:
-          path: ${{ github.workspace }}/ros2_ws/.ccache
-          key: ccache-${{ runner.os }}-${{ github.run_id }}
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.runner }}-${{ github.run_id }}
           restore-keys: |
-            ccache-${{ runner.os }}-
-      - uses: cougars-auv/cougars-dev/.github/actions/setup-ros2-workspace@main
+            ccache-${{ matrix.runner }}-
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
-          repos-file: 'dependencies.repos'
-          packages-path: '.'
-          ssh-key: ${{ secrets.SSH_KEY }}
-      - uses: cougars-auv/cougars-dev/.github/actions/build-test-ros2@main
-        with:
-          packages-path: '.'
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - uses: ros-industrial/industrial_ci@master
+        env:
+          DOCKER_IMAGE: snelsondurrant/cougars:latest
+          DOCKER_PULL: true
+          UPSTREAM_WORKSPACE: dependencies.repos
+          TARGET_WORKSPACE: .
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          AFTER_SETUP_UPSTREAM_WORKSPACE: |
+            vcs custom --git --args submodule update --init --recursive
 
   trigger-upstream:
     needs: build-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger upstream CI
-        uses: peter-evans/repository-dispatch@v4
+      - uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.GH_TOKEN }}
           repository: cougars-auv/cougars-dev
-          event-type: subrepo_ros2_update
+          event-type: ros2_dispatch
           client-payload: '{"repo": "${{ github.repository }}", "sha": "${{ github.sha }}"}'
