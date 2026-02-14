@@ -46,6 +46,7 @@ jobs:
           TARGET_WORKSPACE: .
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
+            git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive
 
   trigger-upstream:
