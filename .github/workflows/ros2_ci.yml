@@ -20,6 +20,10 @@ on:
   pull_request:
     branches: ["main"]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     strategy:
@@ -40,12 +44,11 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       - uses: ros-industrial/industrial_ci@master
         env:
-          DOCKER_IMAGE: snelsondurrant/cougars:latest
+          DOCKER_IMAGE: snelsondurrant/cougars:base
           DOCKER_PULL: true
           UPSTREAM_WORKSPACE: dependencies.repos
           TARGET_WORKSPACE: .
           CCACHE_DIR: ${{ github.workspace }}/.ccache
-          DOCKER_RUN_OPTS: "-e CI=true"
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
             git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive

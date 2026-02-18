@@ -32,16 +32,14 @@ def generate_launch_description():
 
     fleet_params = PathJoinSubstitution(
         [
-            EnvironmentVariable("HOME"),
-            "config",
+            EnvironmentVariable("CONFIG_FOLDER"),
             "fleet",
             "coug_fgo_params.yaml",
         ]
     )
     auv_params = PathJoinSubstitution(
         [
-            EnvironmentVariable("HOME"),
-            "config",
+            EnvironmentVariable("CONFIG_FOLDER"),
             PythonExpression(["'", auv_ns, "' + '_params.yaml'"]),
         ]
     )
